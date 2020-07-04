@@ -19,9 +19,10 @@ import '../widgets/post_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
+  final String page;
   static PageController pageController;
 
-  const HomeScreen({Key key, this.user}) : super(key: key);
+  const HomeScreen({Key key, this.user, this.page}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
@@ -37,10 +38,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    HomeScreen.pageController = new PageController(initialPage: 0);
+    HomeScreen.pageController = new PageController(initialPage: choosePage());
     statusEditingController = new TextEditingController();
     hashtagEditingController = new TextEditingController();
     postBloc = BlocProvider.of<PostBloc>(context);
+  }
+
+  int choosePage() {
+    int pageIndex = 0;
+    switch (widget.page) {
+      case "houses":
+        pageIndex = 0;
+        break;
+      case "posts":
+        pageIndex = 1;
+        break;
+      case "scores":
+        pageIndex = 2;
+        break;
+      case "challenges":
+        pageIndex = 3;
+        break;
+    }
+    return pageIndex;
   }
 
   @override
@@ -58,17 +78,13 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.account_circle),
             onPressed: () {
-              HomeScreen.pageController.animateToPage(1,
-                  duration: Duration(milliseconds: 400),
-                  curve: Curves.fastOutSlowIn);
+              Navigator.pushNamed(context, "/posts");
             },
           ),
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              HomeScreen.pageController.animateToPage(0,
-                  duration: Duration(milliseconds: 400),
-                  curve: Curves.fastOutSlowIn);
+              Navigator.pushNamed(context, "/houses");
             },
           )
         ],
@@ -109,9 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.orange,
                 ),
                 onPressed: () {
-                  HomeScreen.pageController.animateToPage(3,
-                      duration: Duration(milliseconds: 400),
-                      curve: Curves.fastOutSlowIn);
+                  Navigator.pushNamed(context, "/challenges");
                 },
               ),
               IconButton(
@@ -120,9 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.orange,
                 ),
                 onPressed: () {
-                  HomeScreen.pageController.animateToPage(2,
-                      duration: Duration(milliseconds: 400),
-                      curve: Curves.fastOutSlowIn);
+                  Navigator.pushNamed(context, "/scores");
                 },
               ),
             ],

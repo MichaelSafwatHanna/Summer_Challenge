@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:summer_challenge/util/secretKey.dart';
+import 'package:summer_challenge/util/SecretKey.dart';
 
 import '../../models/user.dart';
 import '../../repositories/user_repository.dart';
@@ -35,7 +35,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     final debounceStream = events.where((event) {
       return (event is PhoneNumberChanged ||
           event is UsernameChanged ||
-          event is PasswordChanged || 
+          event is PasswordChanged ||
           event is UsernameSubmitted);
     }).debounceTime(Duration(milliseconds: 300));
     return super.transformEvents(
@@ -52,10 +52,11 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       yield* _mapUsernameChangedToState(event.username);
     } else if (event is PasswordChanged) {
       yield* _mapPasswordChangedToState(event.password);
-    } else if (event is SecretKeyChanged){
+    } else if (event is SecretKeyChanged) {
       yield* _mapSecretKeyChangedToState(event.secretKey);
     } else if (event is Submitted) {
-      yield* _mapFormSubmittedToState(event.user, event.imageData, event.extenstion);
+      yield* _mapFormSubmittedToState(
+          event.user, event.imageData, event.extenstion);
     }
   }
 
@@ -65,15 +66,16 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     );
   }
 
-    Stream<SignUpState> _mapSecretKeyChangedToState(String secretKey) async* {
+  Stream<SignUpState> _mapSecretKeyChangedToState(String secretKey) async* {
     yield state.update(
-      isSecretKeyValid: secretKey ==  SecretKeys.secretKey,
+      isSecretKeyValid: secretKey == SecretKeys.secretKey,
     );
   }
 
   Stream<SignUpState> _mapUsernameChangedToState(String username) async* {
     yield state.update(
-      isUsernameValid: !await UserRepository.isUsernameUsed(username) && Validators.isValidUsername(username),
+      isUsernameValid: !await UserRepository.isUsernameUsed(username) &&
+          Validators.isValidUsername(username),
     );
   }
 
@@ -83,13 +85,17 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     );
   }
 
-  Stream<SignUpState> _mapFormSubmittedToState(User user, Uint8List imageData, String extenstion) async* {
+  Stream<SignUpState> _mapFormSubmittedToState(
+      User user, Uint8List imageData, String extenstion) async* {
     yield SignUpState.loading();
     try {
-       user.profilePicture = 'https://firebasestorage.googleapis.com/v0/b/summercorona2020.appspot.com/o/images%2Fbasicprofilepicture.png?alt=media&token=015ba0ed-7c67-4358-a047-5cbe330de8e8';
-      if(imageData != null){
-      var path = await _userRepository.uploadImageFile(imageData, user.username, extenstion).then((value) => value.toString());
-      user.profilePicture = path;
+      user.profilePicture =
+          'https://firebasestorage.googleapis.com/v0/b/summer2020-628a8.appspot.com/o/images%2Fbasicprofilepicture.png?alt=media&token=7742bc1e-5e5f-4619-ab6f-5525be11f345';
+      if (imageData != null) {
+        var path = await _userRepository
+            .uploadImageFile(imageData, user.username, extenstion)
+            .then((value) => value.toString());
+        user.profilePicture = path;
       }
       await _userRepository.signUp(user);
       yield SignUpState.success();
